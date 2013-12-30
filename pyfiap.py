@@ -1,12 +1,12 @@
-# pyfiap
-# https://github.com/miettal/pyfiap
-# 
-# Copyright 2012, "miettal" Hiromasa Ihara
-# Licensed under the MIT license.
+# pyfiap$
+# https://github.com/miettal/pyfiap$
+# $
+# Copyright 2012, "miettal" Hiromasa Ihara$
+# Licensed under the MIT license.$
 
 import suds
 import uuid
-import datetime
+from datetime import *
 
 import pytz
 
@@ -22,17 +22,17 @@ class APP() :
     return self.fetch(point_id, attrName="time", select = "maximum")[0]
 
   def fetch_latest_1hour(self, point_id) :
-    now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
-    to = (now - datetime.timedelta(hours=30))
+    now = datetime.now(pytz.timezone('Asia/Tokyo'))
+    to = (now - timedelta(hours=30))
     return self.fetch(point_id, attrName="time", gteq = to)
 
   def fetch_latest_1day(self, point_id) :
-    now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
-    to = (now - datetime.timedelta(days=1))
+    now = datetime.now(pytz.timezone('Asia/Tokyo'))
+    to = (now - timedelta(days=1))
     return self.fetch(point_id, attrName="time", gteq = to)
 
   def fetch_by_time(self, point_id, from_, to) :
-    return self.fetch(point_id, attrName="time", gteq=from_, lteq=to)
+    return self.fetch(point_id, attrName="time", gteq=to, lteq=from_)
 
   def fetch(self, point_id,
       attrName = None,
@@ -98,7 +98,7 @@ class APP() :
 
   def write(self, point_id, value, time = None) :
     if time == None :
-      time = datetime.datetime.now(pytz.timezone('Asia/Tokyo')).isoformat()
+      time = datetime.now(pytz.timezone('Asia/Tokyo')).isoformat()
     return self.write_([(point_id, value, time)])
 
   def write_multiple(self, datas) :
@@ -142,10 +142,10 @@ def concat_point_set(point_set) :
 
 if __name__ == "__main__" :
   import pprint
-  wsdl_url = "http://..."
+  wsdl_url = "http://fiap-dev.gutp.ic.i.u-tokyo.ac.jp/axis2/services/FIAPStorage?wsdl"
   point_id = "http://..."
   app = APP(wsdl_url)
 
-  from_ = (datetime.datetime.now(pytz.utc)-datetime.timedelta(days=3))
-  to = datetime.datetime.now(pytz.utc)
+  from_ = (datetime.now(pytz.utc)-timedelta(days=3))
+  to = datetime.now(pytz.utc)
   pprint.pprint(app.fetch_by_time(point_id, from_=from_, to=to))
