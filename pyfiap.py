@@ -1,8 +1,8 @@
-# pyfiap$
-# https://github.com/miettal/pyfiap$
-# $
-# Copyright 2012, "miettal" Hiromasa Ihara$
-# Licensed under the MIT license.$
+# pyfiap
+# https://github.com/miettal/pyfiap
+# 
+# Copyright 2012, "miettal" Hiromasa Ihara
+# Licensed under the MIT license.
 
 import suds
 import uuid
@@ -23,16 +23,16 @@ class APP() :
 
   def fetch_latest_1hour(self, point_id) :
     now = datetime.now(pytz.timezone('Asia/Tokyo'))
-    to = (now - timedelta(hours=30))
-    return self.fetch(point_id, attrName="time", gteq = to)
+    from_ = (now - timedelta(hours=30))
+    return self.fetch(point_id, attrName="time", gteq = from_)
 
   def fetch_latest_1day(self, point_id) :
     now = datetime.now(pytz.timezone('Asia/Tokyo'))
-    to = (now - timedelta(days=1))
-    return self.fetch(point_id, attrName="time", gteq = to)
+    from_ = (now - timedelta(days=1))
+    return self.fetch(point_id, attrName="time", gteq = from_)
 
   def fetch_by_time(self, point_id, from_, to) :
-    return self.fetch(point_id, attrName="time", gteq=to, lteq=from_)
+    return self.fetch(point_id, attrName="time", gteq=from_, lteq=to)
 
   def fetch(self, point_id,
       attrName = None,
