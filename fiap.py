@@ -44,6 +44,9 @@ class APP() :
     return self.fetch(keys)
 
   def fetch(self, keys) :
+    if type(keys) != list :
+      keys = [keys]
+
     datas = []
 
     cursor = ""
