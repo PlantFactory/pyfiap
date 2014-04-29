@@ -19,53 +19,55 @@ class APP() :
     self.soap_client = suds.client.Client(wsdl_url, plugins=[FixNamespace()])
 
   def fetch_latest(self, point_id) :
-    return self.fetch(point_id, attrName="time", select = "maximum")[0]
+    key = {
+      'point_id': point_id,
+      'attrName': "time",
+      'select': "maximum",
+    }
 
-  def fetch_latest_1hour(self, point_id) :
-    now = datetime.now(pytz.timezone('Asia/Tokyo'))
-    from_ = (now - timedelta(hours=30))
-    return self.fetch(point_id, attrName="time", gteq = from_)
+    return self.fetch(key)[0]
 
-  def fetch_latest_1day(self, point_id) :
-    now = datetime.now(pytz.timezone('Asia/Tokyo'))
-    from_ = (now - timedelta(days=1))
-    return self.fetch(point_id, attrName="time", gteq = from_)
 
-  def fetch_by_time(self, point_id, from_, to) :
-    return self.fetch(point_id, attrName="time", gteq=from_, lteq=to)
+  def fetch_by_time(self, point_ids, from_, to) :
+    if type(point_ids) != list :
+      point_ids = [point_ids]
 
-  def fetch(self, point_id,
-      attrName = None,
-      eq = None,
-      neq = None,
-      lt = None,
-      gt = None,
-      lteq = None,
-      gteq = None,
-      select = None) :
+    keys = []
+    for point_id in point_ids :
+      keys.append({
+        'point_id': point_id,
+        'attrName': "time",
+        'gteq': from_,
+        'lteq': to,
+      })
 
+    return self.fetch(keys)
+
+  def fetch(self, keys) :
     datas = []
 
     cursor = ""
     while True :
       # build request
       transport_rq = self.soap_client.factory.create('ns0:transport')
-      key = self.soap_client.factory.create('ns0:key')
 
       transport_rq.header.query._id = str(uuid.uuid4())
       transport_rq.header.query._type = "storage"
       transport_rq.header.query._cursor = cursor
       transport_rq.header.query._acceptableSize = 1000
-      transport_rq.header.query.key.append(key)
-      transport_rq.header.query.key[0]._id = point_id
-      transport_rq.header.query.key[0]._attrName = attrName
-      transport_rq.header.query.key[0]._eq = eq
-      transport_rq.header.query.key[0]._neq = neq
-      transport_rq.header.query.key[0]._lt = lt
-      transport_rq.header.query.key[0]._gt =  gt
-      transport_rq.header.query.key[0]._lteq = lteq
-      transport_rq.header.query.key[0]._gteq = gteq
-      transport_rq.header.query.key[0]._select = select
+
+      for key_ in keys :
+        key = self.soap_client.factory.create('ns0:key')
+        key._id = key_["point_id"]
+        key._attrName = key_["attrName"]
+        if "eq" in key_ : key._eq = key_["eq"]
+        if "neq" in key_ : key._neq = key_["neq"]
+        if "lt" in key_ : key._lt = key_["lt"]
+        if "gt" in key_ : key._gt =  key_["gt"]
+        if "lteq" in key_ : key._lteq = key_["lteq"]
+        if "gteq" in key_ : key._gteq = key_["gteq"]
+        if "select" in key_ : key._select = key_["select"]
+        transport_rq.header.query.key.append(key)
 
       # dummy
       transport_rq.header.error._type = "DUMMY"
