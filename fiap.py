@@ -4,19 +4,16 @@
 # Copyright 2012, "miettal" Hiromasa Ihara
 # Licensed under the MIT license.
 
-import suds
+# note:suds-jurko
+from suds.client import Client
 import uuid
 from datetime import *
 
 import pytz
 
-class FixNamespace(suds.plugin.MessagePlugin):
-  def marshalled(self, context):
-    context.envelope[1][0][0].setPrefix('ns2')
-
 class APP() :
   def __init__(self, wsdl_url) :
-    self.soap_client = suds.client.Client(wsdl_url, plugins=[FixNamespace()])
+    self.soap_client = Client(wsdl_url)
 
   def fetch_latest(self, point_id) :
     key = {
@@ -91,7 +88,10 @@ class APP() :
         point_id = point._id
         if 'value' in dir(point) :
           for value in point.value :
-            datas.append((point_id, value.value, value._time))
+            datas.append({
+              "point_id":point_id,
+              "value":value.value,
+              "time":value._time})
 
       # set next cursor
       if '_cursor' in dir(transport_rs.header.query) :
@@ -140,7 +140,9 @@ def concat_point_set(point_set) :
   for point_child in point_set.point :
     point_id = point_child._id
     for value in point.value :
-      values.append(point_id, value.value, value._time)
+      values.append({"point_id":point_id,
+        "value":value.value,
+        "time":value._time})
   
   return values
 
