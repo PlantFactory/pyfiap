@@ -11,9 +11,24 @@ from datetime import *
 
 import pytz
 
+# for gzip transport
+from suds.transport.http import HttpTransport
+import gzip
+from StringIO import StringIO
+
+class GzipTransport(HttpTransport) :
+  def send(self, request):
+    request.headers['Accept-encoding'] = 'gzip'
+    result = HttpTransport.send(self, request)
+    if result.headers['content-encoding'] == 'gzip' :
+      buf = StringIO(result.message)
+      f = gzip.GzipFile(fileobj=buf)
+      result.message = f.read()
+    return result
+
 class APP() :
   def __init__(self, wsdl_url) :
-    self.soap_client = Client(wsdl_url)
+    self.soap_client = Client(wsdl_url, transport=GzipTransport())
 
   def fetch_latest(self, point_id) :
     key = {
@@ -23,7 +38,6 @@ class APP() :
     }
 
     return self.fetch(key)[0]
-
 
   def fetch_by_time(self, point_ids, from_, to) :
     if type(point_ids) != list :
