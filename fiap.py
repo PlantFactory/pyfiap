@@ -9,8 +9,6 @@ from suds.client import Client
 import uuid
 from datetime import *
 
-import pytz
-
 # for gzip transport
 from suds.transport.http import HttpTransport
 import gzip
@@ -30,14 +28,19 @@ class APP() :
   def __init__(self, wsdl_url) :
     self.soap_client = Client(wsdl_url, transport=GzipTransport())
 
-  def fetch_latest(self, point_id) :
-    key = {
-      'point_id': point_id,
-      'attrName': "time",
-      'select': "maximum",
-    }
+  def fetch_latest(self, point_ids) :
+    if type(point_ids) != list :
+      point_ids = [point_ids]
 
-    return self.fetch(key)[0]
+    keys = []
+    for point_id in point_ids :
+      keys.append({
+        'point_id': point_id,
+        'attrName': "time",
+        'select': "maximum",
+      })
+
+    return self.fetch(keys)
 
   def fetch_by_time(self, point_ids, from_, to) :
     if type(point_ids) != list :
@@ -58,7 +61,7 @@ class APP() :
     if type(keys) != list :
       keys = [keys]
 
-    datas = []
+    data = []
 
     cursor = ""
     while True :
@@ -102,7 +105,7 @@ class APP() :
         point_id = point._id
         if 'value' in dir(point) :
           for value in point.value :
-            datas.append({
+            data.append({
               "point_id":point_id,
               "value":value.value,
               "time":value._time})
@@ -113,22 +116,14 @@ class APP() :
       else :
         break
 
-    return datas
+    return data
 
-  def write(self, point_id, value, time = None) :
-    if time == None :
-      time = datetime.now(pytz.timezone('Asia/Tokyo')).isoformat()
-    return self.write_([(point_id, value, time)])
-
-  def write_multiple(self, datas) :
-    while 0 < len(datas)  :
-      self.write_(datas[:5000])
-      datas = datas[5000:]
-
-  def write_(self, datas) :
+  def write(self, data) :
+    if type(data) != list :
+      data = [data]
     # build request
     transport_rq = self.soap_client.factory.create('ns0:transport')
-    for (point_id, value, time) in datas :
+    for (point_id, value, time) in data :
       point = self.soap_client.factory.create('ns0:point')
       value_ = self.soap_client.factory.create('ns0:value')
       value_.value = value
@@ -167,6 +162,6 @@ if __name__ == "__main__" :
   point_id = "http://..."
   app = APP(wsdl_url)
 
-  from_ = (datetime.now(pytz.utc)-timedelta(days=3))
-  to = datetime.now(pytz.utc)
+  from_ = (datetime.now()-timedelta(days=3))
+  to = datetime.now()
   pprint.pprint(app.fetch_by_time(point_id, from_=from_, to=to))
