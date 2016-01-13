@@ -18,7 +18,8 @@ class GzipTransport(HttpTransport) :
   def send(self, request):
     request.headers['Accept-encoding'] = 'gzip'
     result = HttpTransport.send(self, request)
-    if result.headers['content-encoding'] == 'gzip' :
+    if ('content-encoding' in result.headers and
+        result.headers['content-encoding'] == 'gzip') :
       buf = StringIO(result.message)
       f = gzip.GzipFile(fileobj=buf)
       result.message = f.read()
