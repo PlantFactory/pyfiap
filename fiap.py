@@ -1,7 +1,7 @@
 # pyfiap
 # https://github.com/miettal/pyfiap
 # 
-# Copyright 2012, "miettal" Hiromasa Ihara
+# Copyright 2016, Hiromasa Ihara
 # Licensed under the MIT license.
 
 # note:suds-jurko
