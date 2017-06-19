@@ -1,0 +1,2 @@
+pyfiap==0.1.0
+suds-jurko==0.6
