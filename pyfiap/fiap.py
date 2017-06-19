@@ -1,6 +1,6 @@
 # pyfiap
 # https://github.com/miettal/pyfiap
-# 
+#
 # Copyright 2016, Hiromasa Ihara
 # Licensed under the MIT license.
 
@@ -12,7 +12,7 @@ from datetime import *
 # for gzip transport
 from suds.transport.http import HttpTransport
 import gzip
-from StringIO import StringIO
+from io import BytesIO
 
 class GzipTransport(HttpTransport) :
   def send(self, request):
@@ -20,7 +20,7 @@ class GzipTransport(HttpTransport) :
     result = HttpTransport.send(self, request)
     if ('content-encoding' in result.headers and
         result.headers['content-encoding'] == 'gzip') :
-      buf = StringIO(result.message)
+      buf = BytesIO(result.message)
       f = gzip.GzipFile(fileobj=buf)
       result.message = f.read()
     return result
@@ -153,7 +153,7 @@ def concat_point_set(point_set) :
       values.append({"point_id":point_id,
         "value":value.value,
         "time":value._time})
-  
+
   return values
 
 
