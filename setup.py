@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 from setuptools import setup, find_packages
-from pyfiap import __author__, __version__, __license__
+
+__author__  = 'miettal'
+__version__ = '0.0.1'
+__license__ = 'MIT'
+
 
 setup(
     name             = 'pyfiap',
