@@ -120,7 +120,7 @@ class APP() :
     return data
 
   def write(self, data) :
-    if type(data) != list :
+    if type(data[0]) != list :
       data = [data]
     # build request
     transport_rq = self.soap_client.factory.create('ns0:transport')
