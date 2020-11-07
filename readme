@@ -3,3 +3,22 @@ https://github.com/PlantFactory/pyfiap
 
 Copyright 2016, Hiromasa Ihara
 Licensed under the MIT license.
+
+** HowTo Install
+1. download pyfiap-master.zip from https://github.com/PlantFactory/pyfiap and unzip the zipfile.
+2. Install pyfiap by the following command (Windows)
+c:\> python setup.py install
+
+
+** HowTo Use (fiap_read)
+3. After installation, modify sample/fiap_read.py as following
+   8:fiap = pyfiap.fiap.APP("http://ants.jga.kisarazu.ac.jp/axis2/services/FIAPStorage?wsdl")
+  10:result = fiap.fetch_latest('http://j.kisarazu.ac.jp/PlantFactory/Daisen/West/CO2')
+  13:result = fiap.fetch_by_time('http://j.kisarazu.ac.jp/PlantFactory/Daisen/West/CO2', yesterday, today)
+
+// maybe, initial URL is right.
+// the above fiap_id is a sample. please specify your point_id!
+
+4. Execute the python file "python fiap_read.py"
+
+5. variable 'result' is dictonal array, so you can select data from the array.
